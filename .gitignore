@@ -1,0 +1,49 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spring Boot
+*.log
+*.gz
+*.tmp
+
+# Archivos temporales del proyecto
+test-backend.ps1
+probar-endpoints.ps1
+token.txt
+cargar-datos.ps1
+
+# Base de datos H2 (si usas H2 local)
+*.db
+*.trace.db
+
+# Archivos de configuracion local (opcional)
+# application-local.properties
+
+/src/generated/prisma
+
+# Node.js / NPM
+node_modules/
+package-lock.json
+yarn.lock
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production.local

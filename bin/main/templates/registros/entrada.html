@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Entrada</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/global-typography.css" rel="stylesheet">
+    <link href="/css/design-system.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+    <style>
+        body { padding-top: 20px; }
+        .examen-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #0066cc;
+        }
+        .hidden-section {
+            display: none;
+        }
+        .visible-section {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar Principal -->
+    <nav class="navbar navbar-expand-lg sticky-top" style="background-color: var(--color-deep-blue) !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <!-- Primera sección: Logo y usuario -->
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/web/dashboard">
+                <i class="fas fa-flask me-2"></i>Sistema de Laboratorios FING
+            </a>
+            <div class="ms-auto d-flex align-items-center">
+                <span class="text-white me-3"><i class="fas fa-user-circle me-1"></i> <strong><span sec:authentication="name">Usuario</span></strong></span>
+                <form th:action="@{/logout}" method="post" class="d-inline">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="btn btn-logout btn-sm"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Segunda sección: Navegación -->
+    <nav class="navbar navbar-expand-lg" style="background-color: #f8f9fa !important;">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="/web/dashboard"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/web/laboratorios"><i class="fas fa-building"></i> Laboratorios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/web/equipos"><i class="fas fa-desktop"></i> Equipos</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/web/registros"><i class="fas fa-clipboard-list"></i> Registros</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/web/novedades"><i class="fas fa-exclamation-circle"></i> Novedades</a></li>
+                    <li class="nav-item" sec:authorize="hasAnyRole('ROLE_FACULTAD_DIRECTOR_CARRERA', 'ROLE_ADMIN')">
+                        <a class="nav-link" href="/web/auditoria"><i class="fas fa-history"></i> Auditoría</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container container-main" style="max-width: 600px;">
+        <div class="header-section">
+            <h1><i class="fas fa-sign-in-alt me-2"></i>Registrar Entrada</h1>
+            <a href="/web/registros" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Volver
+            </a>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/web/registros/entrada}" th:object="${registro}" method="post">
+            
+            <!-- Opción: Examen o Uso Normal -->
+            <div class="mb-4">
+                <label class="form-label"><i class="fas fa-clipboard-check me-2"></i>Tipo de Uso</label>
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check" name="tipoUso" id="tipoNormal" value="normal" checked 
+                           onchange="alternarExamen(false)">
+                    <label class="btn btn-outline-primary" for="tipoNormal">
+                        <i class="fas fa-dna me-1"></i> Uso Normal
+                    </label>
+                    
+                    <input type="radio" class="btn-check" name="tipoUso" id="tipoExamen" value="examen"
+                           onchange="alternarExamen(true)">
+                    <label class="btn btn-outline-success" for="tipoExamen">
+                        <i class="fas fa-graduation-cap me-1"></i> Examen
+                    </label>
+                </div>
+            </div>
+
+            <!-- Formulario para uso normal -->
+            <div id="formularioNormal">
+                <div class="mb-3">
+                    <label class="form-label">Laboratorio</label>
+                    <select class="form-select" th:field="*{laboratorioId}">
+                        <option value="" disabled>Seleccione un laboratorio</option>
+                        <option th:each="lab : ${laboratorios}" th:value="${lab.id}" th:text="${lab.nombre}"></option>
+                    </select>
+                    <div class="text-danger" th:if="${#fields.hasErrors('laboratorioId')}" th:errors="*{laboratorioId}"></div>
+                </div>
+            </div>
+
+            <!-- Formulario para examen (dos laboratorios) -->
+            <div id="formularioExamen" class="examen-section hidden-section">
+                <h5 class="mb-3"><i class="fas fa-graduation-cap me-2"></i>Seleccione dos laboratorios para el examen</h5>
+                
+                <div class="mb-3">
+                    <label class="form-label">Laboratorio Principal</label>
+                    <select class="form-select" id="laboratorioPrincipal" name="laboratorioPrincipal">
+                        <option value="">Seleccione laboratorio principal</option>
+                        <option th:each="lab : ${laboratorios}" th:value="${lab.id}" th:text="${lab.nombre}"></option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Laboratorio Secundario (Sala Separada)</label>
+                    <select class="form-select" id="laboratorioSecundario" th:field="*{laboratorioSecundarioId}">
+                        <option value="">Seleccione laboratorio secundario</option>
+                        <option th:each="lab : ${laboratorios}" th:value="${lab.id}" th:text="${lab.nombre}"></option>
+                    </select>
+                </div>
+
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Nota:</strong> En exámenes puedes usar dos laboratorios (salas) separadas. Selecciona ambos laboratorios.
+                </div>
+            </div>
+
+            <!-- Propósito (común para ambos) -->
+            <div class="mb-3">
+                <label class="form-label">Propósito</label>
+                <input type="text" class="form-control" th:field="*{proposito}" 
+                       placeholder="Clase, Investigación, Práctica, Examen...">
+                <div class="text-danger" th:if="${#fields.hasErrors('proposito')}" th:errors="*{proposito}"></div>
+            </div>
+
+            <!-- Observaciones -->
+            <div class="mb-3">
+                <label class="form-label">Observaciones</label>
+                <textarea class="form-control" th:field="*{observaciones}" rows="3" placeholder="Comentarios adicionales..."></textarea>
+            </div>
+
+            <!-- Campo oculto para esExamen -->
+            <input type="hidden" id="esExamen" th:field="*{esExamen}" value="false">
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="/web/registros" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Confirmar Entrada
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function alternarExamen(esExamen) {
+            const formularioNormal = document.getElementById('formularioNormal');
+            const formularioExamen = document.getElementById('formularioExamen');
+            const esExamenInput = document.getElementById('esExamen');
+            const laboratorioPrincipal = document.getElementById('laboratorioPrincipal');
+            const laboratorioIdField = document.querySelector('[name="laboratorioId"]');
+
+            if (esExamen) {
+                // Mostrar formulario de examen
+                formularioNormal.classList.add('hidden-section');
+                formularioExamen.classList.remove('hidden-section');
+                esExamenInput.value = 'true';
+                
+                // Copiar laboratorio principal al campo laboratorioId
+                laboratorioIdField.addEventListener('change', function() {
+                    laboratorioPrincipal.value = this.value;
+                });
+                
+                laboratorioPrincipal.addEventListener('change', function() {
+                    laboratorioIdField.value = this.value;
+                });
+            } else {
+                // Mostrar formulario normal
+                formularioNormal.classList.remove('hidden-section');
+                formularioExamen.classList.add('hidden-section');
+                esExamenInput.value = 'false';
+                laboratorioPrincipal.value = '';
+                document.getElementById('laboratorioSecundario').value = '';
+            }
+        }
+
+        // Inicializar sincronización de laboratorios
+        document.addEventListener('DOMContentLoaded', function() {
+            const laboratorioPrincipal = document.getElementById('laboratorioPrincipal');
+            const laboratorioIdField = document.querySelector('[name="laboratorioId"]');
+            
+            laboratorioPrincipal.addEventListener('change', function() {
+                laboratorioIdField.value = this.value;
+            });
+            
+            laboratorioIdField.addEventListener('change', function() {
+                laboratorioPrincipal.value = this.value;
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

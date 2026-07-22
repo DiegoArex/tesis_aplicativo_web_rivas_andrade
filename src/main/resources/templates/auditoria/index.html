@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoría - Sistema de Laboratorios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/global-typography.css" rel="stylesheet">
+    <link href="/css/design-system.css" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary-light: #4fa3de;
+            --color-primary: #1e5a96;
+            --color-primary-dark: #0d3d66;
+            --color-deep-blue: #051d33;
+            --color-nearly-black: #030d14;
+            --color-accent: #2e7ca6;
+            --color-bg-light: #f0f2f5;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--color-deep-blue) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb-container {
+            background: white;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 0;
+        }
+
+        .breadcrumb {
+            margin-bottom: 0;
+        }
+
+        .breadcrumb-item a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--color-primary-light);
+            text-decoration: underline;
+        }
+
+        /* Main Content Area */
+        .auditoria-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .auditoria-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+            margin-bottom: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .auditoria-section {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        /* Description Box */
+        .description-box {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--color-primary);
+        }
+
+        .description-box h2 {
+            color: var(--color-deep-blue);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .description-box h2 i {
+            color: var(--color-primary);
+            font-size: 2rem;
+        }
+
+        .description-box p {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .features-section {
+            margin-top: 2rem;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--color-accent);
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: #f0f1f2;
+            transform: translateX(4px);
+        }
+
+        .feature-icon {
+            flex-shrink: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--color-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .feature-content h3 {
+            color: var(--color-deep-blue);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-content p {
+            color: #666;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Buttons Container */
+        .buttons-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .buttons-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .btn-auditoria {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            min-height: 220px;
+        }
+
+        .btn-auditoria::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -100px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-auditoria:hover::before {
+            right: -50px;
+        }
+
+        .btn-auditoria:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+        }
+
+        .btn-auditoria-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-auditoria-text {
+            font-size: 1.15rem;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-auditoria-desc {
+            font-size: 0.8rem;
+            opacity: 0.85;
+            position: relative;
+            z-index: 1;
+            max-width: 90%;
+        }
+
+        .btn-laboratorios {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+        }
+
+        .btn-novedades {
+            background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary-dark) 100%);
+        }
+
+        .btn-cambios {
+            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        }
+
+        /* Footer */
+        .auditoria-footer {
+            background: white;
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            margin-top: 4rem;
+        }
+
+        .auditoria-footer p {
+            color: #999;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar Principal -->
+    <nav class="navbar navbar-expand-lg sticky-top" style="background-color: var(--color-deep-blue) !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <!-- Primera sección: Logo y usuario -->
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/web/dashboard">
+                <i class="fas fa-flask me-2"></i>Sistema de Laboratorios FING
+            </a>
+            <div class="ms-auto d-flex align-items-center">
+                <span class="text-white me-3"><i class="fas fa-user-circle me-1"></i> <strong><span sec:authentication="name">Usuario</span></strong></span>
+                <form th:action="@{/logout}" method="post" class="d-inline">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="btn btn-logout btn-sm"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Segunda sección: Navegación -->
+    <nav class="navbar navbar-expand-lg" style="background-color: #f8f9fa !important;">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="/web/dashboard"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/web/laboratorios"><i class="fas fa-building"></i> Laboratorios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/web/equipos"><i class="fas fa-desktop"></i> Equipos</a></li>
+                    <li class="nav-item" sec:authorize="hasAnyRole('ROLE_PROFESOR', 'ROLE_FACULTAD_DIRECTOR_CARRERA', 'ROLE_ADMIN')">
+                        <a class="nav-link" href="/web/registros"><i class="fas fa-clipboard-list"></i> Registros</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/web/novedades"><i class="fas fa-exclamation-circle"></i> Novedades</a></li>
+                    <li class="nav-item" sec:authorize="hasAnyRole('ROLE_FACULTAD_DIRECTOR_CARRERA', 'ROLE_ADMIN')">
+                        <a class="nav-link active" href="/web/auditoria"><i class="fas fa-history"></i> Auditoría</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+
+    <!-- Main Content -->
+    <div class="auditoria-main">
+        <div class="auditoria-section">
+            <!-- Description -->
+            <div class="description-box">
+                <h2>
+                    <i class="fas fa-shield-alt"></i>
+                    ¿Qué es la Auditoría?
+                </h2>
+                <p>
+                    La auditoría del sistema proporciona un registro completo y detallado de todas las actividades realizadas 
+                    en la plataforma. Permite supervisar, rastrear y analizar los cambios en los datos del sistema, garantizando 
+                    transparencia y seguridad integral en la gestión de laboratorios.
+                </p>
+                <p>
+                    Contamos con tres módulos principales de auditoría que te permitirán mantener un control exhaustivo sobre 
+                    todas las operaciones críticas del sistema.
+                </p>
+            </div>
+
+            <!-- Features -->
+            <div class="features-section">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Auditoría de Uso de Laboratorios</h3>
+                        <p>Monitoreo completo de acceso, ocupación de laboratorios, registros de entrada/salida y clases programadas.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Registro de Novedades</h3>
+                        <p>Seguimiento detallado de incidentes, reportes y eventos especiales ocurridos en los laboratorios.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Cambios Operacionales</h3>
+                        <p>Registro completo de creación, modificación y eliminación de laboratorios y equipos con identificación de responsables.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mt-5 mb-5">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <a href="/web/auditoria/uso-laboratorios" class="btn-auditoria btn-laboratorios" title="Ver auditoría de uso de laboratorios con horarios, accesos y clases">
+                    <div class="btn-auditoria-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <div class="btn-auditoria-text">Uso de Laboratorios</div>
+                    <div class="btn-auditoria-desc">Monitoreo de acceso y utilización</div>
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <a href="/web/auditoria/novedades" class="btn-auditoria btn-novedades" title="Ver registro de novedades e incidentes reportados">
+                    <div class="btn-auditoria-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="btn-auditoria-text">Registro de Novedades</div>
+                    <div class="btn-auditoria-desc">Seguimiento de incidentes y reportes</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Additional Action Button -->
+        <div class="row mb-5">
+            <div class="col-lg-6 mx-auto">
+                <a href="/web/auditoria/cambios-operacionales" class="btn-auditoria btn-cambios" title="Ver cambios operacionales: creación, modificación y eliminación de laboratorios y equipos">
+                    <div class="btn-auditoria-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="btn-auditoria-text">Cambios Operacionales</div>
+                    <div class="btn-auditoria-desc">Quién creó, modificó o eliminó laboratorios y equipos</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="auditoria-footer">
+        <p>&copy; 2026 Sistema de Laboratorios FING - Todos los derechos reservados</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

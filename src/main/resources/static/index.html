@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba JWT - Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background: #f8f9fa;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f8;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .token-display {
+            word-break: break-all;
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 11px;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Prueba de JWT Resource Server</h1>
+        
+        <div class="section">
+            <h2>1️⃣ Autenticación con Keycloak</h2>
+            <p>Este aplicativo usa <strong>Authorization Code Flow con PKCE</strong> (apropiado para apps móviles y SPAs)</p>
+            <button onclick="loginWithKeycloak()">🔑 Login con Keycloak</button>
+            <button id="logout-btn" onclick="logout()" style="display:none; background: #dc3545;">🚪 Logout</button>
+            <p id="auth-status" class="info"></p>
+            <div id="token-info" style="display:none;">
+                <p class="success">✅ Token obtenido correctamente</p>
+                <p><strong>Usuario:</strong> <span id="username"></span></p>
+                <p><strong>Token JWT:</strong></p>
+                <div class="token-display" id="token-display"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2️⃣ Probar Endpoints</h2>
+            <button onclick="testPublic()">🌍 /public (sin auth)</button>
+            <button onclick="testMe()">👤 /me (info usuario)</button>
+            <button onclick="testAdmin()">👑 /admin (ROLE_ADMIN)</button>
+            <button onclick="testProfesor()">👨‍🏫 /profesor (ROLE_PROFESOR)</button>
+            <button onclick="testNotas()">📝 /notas (PROFESOR o DIRECTOR)</button>
+        </div>
+
+        <div class="section">
+            <h2>📊 Resultados</h2>
+            <pre id="results">Esperando peticiones...</pre>
+        </div>
+
+        <div class="section">
+            <h2>👥 Usuarios de Prueba</h2>
+            <ul>
+                <li><strong>profesor1 / profesor1</strong> → ROLE_ADMIN</li>
+                <li><strong>profesor2 / profesor2</strong> → ROLE_PROFESOR, ROLE_FACULTAD_DIRECTOR_CARRERA</li>
+                <li><strong>profesor3 / profesor3</strong> → ROLE_PROFESOR</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let accessToken = null;
+
+        // Configuración OAuth2
+        const config = {
+            authUrl: 'https://fing-auth.ideasybits.com/auth/realms/siac-realm-test/protocol/openid-connect/auth',
+            tokenUrl: 'https://fing-auth.ideasybits.com/auth/realms/siac-realm-test/protocol/openid-connect/token',
+            clientId: 'siac-app-movil',
+            redirectUri: window.location.origin + '/callback',
+            scope: 'openid roles'
+        };
+
+        // Generar code_verifier y code_challenge para PKCE
+        function generateCodeVerifier() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            return base64URLEncode(array);
+        }
+
+        async function generateCodeChallenge(verifier) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(verifier);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return base64URLEncode(new Uint8Array(digest));
+        }
+
+        function base64URLEncode(buffer) {
+            return btoa(String.fromCharCode(...buffer))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        // Iniciar login
+        async function loginWithKeycloak() {
+            const codeVerifier = generateCodeVerifier();
+            const codeChallenge = await generateCodeChallenge(codeVerifier);
+            
+            sessionStorage.setItem('code_verifier', codeVerifier);
+            
+            const authorizationUrl = new URL(config.authUrl);
+            authorizationUrl.searchParams.append('response_type', 'code');
+            authorizationUrl.searchParams.append('client_id', config.clientId);
+            authorizationUrl.searchParams.append('redirect_uri', config.redirectUri);
+            authorizationUrl.searchParams.append('scope', config.scope);
+            authorizationUrl.searchParams.append('code_challenge', codeChallenge);
+            authorizationUrl.searchParams.append('code_challenge_method', 'S256');
+            
+            window.location.href = authorizationUrl.toString();
+        }
+
+        // Manejar callback
+        async function handleCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            
+            if (code) {
+                document.getElementById('auth-status').textContent = '🔄 Intercambiando código por token...';
+                
+                const codeVerifier = sessionStorage.getItem('code_verifier');
+                
+                const body = new URLSearchParams({
+                    grant_type: 'authorization_code',
+                    client_id: config.clientId,
+                    redirect_uri: config.redirectUri,
+                    code: code,
+                    code_verifier: codeVerifier
+                });
+
+                try {
+                    const response = await fetch(config.tokenUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: body
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        accessToken = data.access_token;
+                        
+                        document.getElementById('token-info').style.display = 'block';
+                        document.getElementById('token-display').textContent = accessToken;
+                        document.getElementById('auth-status').innerHTML = '<span class="success">✅ Autenticado correctamente</span>';
+                        
+                        // Limpiar URL
+                        window.history.replaceState({}, document.title, '/');
+                        sessionStorage.removeItem('code_verifier');
+                        
+                        // Decodificar y mostrar info del token
+                        showTokenInfo();
+                    } else {
+                        const errorData = await response.text();
+                        document.getElementById('auth-status').innerHTML = '<span class="error">❌ Error obteniendo token: ' + errorData + '</span>';
+                    }
+                } catch (error) {
+                    document.getElementById('auth-status').innerHTML = '<span class="error">❌ Error: ' + error.message + '</span>';
+                }
+            }
+        }
+
+        function showTokenInfo() {
+            if (!accessToken) return;
+            
+            const parts = accessToken.split('.');
+            const payload = JSON.parse(atob(parts[1]));
+            
+            // Mostrar username
+            document.getElementById('username').textContent = payload.preferred_username || 'Usuario desconocido';
+            
+            // Mostrar botón de logout
+            document.getElementById('logout-btn').style.display = 'inline-block';
+            
+            log('INFO DEL TOKEN', payload);
+        }
+
+        function logout() {
+            // Limpiar token local
+            accessToken = null;
+            sessionStorage.removeItem('code_verifier');
+            
+            // Ocultar token y botón de logout
+            document.getElementById('token-info').style.display = 'none';
+            document.getElementById('logout-btn').style.display = 'none';
+            document.getElementById('auth-status').innerHTML = '<span class="info">Sesión cerrada</span>';
+            
+            // Limpiar resultados
+            document.getElementById('results').textContent = 'Esperando peticiones...';
+            
+            // Redirigir a logout de Keycloak
+            const logoutUrl = 'https://fing-auth.ideasybits.com/auth/realms/siac-realm-test/protocol/openid-connect/logout?redirect_uri=' + encodeURIComponent(window.location.origin);
+            
+            // Esperar un poco y luego redirigir
+            setTimeout(() => {
+                window.location.href = logoutUrl;
+            }, 500);
+        }
+
+        // Llamadas a endpoints
+        async function testPublic() {
+            try {
+                const response = await fetch('/public');
+                const data = await response.text();
+                log('/public (sin autenticación)', { status: response.status, data });
+            } catch (error) {
+                log('/public ERROR', error.message);
+            }
+        }
+
+        async function testMe() {
+            if (!accessToken) {
+                alert('⚠️ Primero debes hacer login');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/me', {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                const data = await response.json();
+                log('/me (info usuario)', { status: response.status, data });
+            } catch (error) {
+                log('/me ERROR', error.message);
+            }
+        }
+
+        async function testAdmin() {
+            await testEndpoint('/admin', 'ROLE_ADMIN');
+        }
+
+        async function testProfesor() {
+            await testEndpoint('/profesor', 'ROLE_PROFESOR');
+        }
+
+        async function testNotas() {
+            await testEndpoint('/notas', 'ROLE_PROFESOR o ROLE_FACULTAD_DIRECTOR_CARRERA');
+        }
+
+        async function testEndpoint(endpoint, requiredRole) {
+            if (!accessToken) {
+                alert('⚠️ Primero debes hacer login');
+                return;
+            }
+            
+            try {
+                const response = await fetch(endpoint, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ ${endpoint} (requiere ${requiredRole})`, { status: response.status, data });
+                } else {
+                    log(`❌ ${endpoint} - Acceso denegado`, { status: response.status, requiredRole });
+                }
+            } catch (error) {
+                log(`${endpoint} ERROR`, error.message);
+            }
+        }
+
+        function log(title, data) {
+            const resultsEl = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            resultsEl.textContent = `[${timestamp}] ${title}\n${JSON.stringify(data, null, 2)}\n\n${resultsEl.textContent}`;
+        }
+
+        // Ejecutar al cargar
+        handleCallback();
+    </script>
+</body>
+</html>

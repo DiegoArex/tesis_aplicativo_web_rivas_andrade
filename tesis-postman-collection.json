@@ -1,0 +1,832 @@
+{
+  "info": {
+    "name": "Tesis - Laboratorios API",
+    "_postman_id": "tesis-rivas-andrade-2026",
+    "description": "Colección completa de endpoints para el sistema de gestión de laboratorios de computación",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "    pm.collectionVariables.set('token', json.access_token);",
+                  "    console.log('✅ Token guardado automáticamente');",
+                  "} else {",
+                  "    console.log('❌ No se encontró access_token en la respuesta');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login con Keycloak. Guarda automáticamente el token en la variable {{token}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏫 Laboratorios",
+      "item": [
+        {
+          "name": "Listar todos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/laboratorios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratorios"]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/laboratorios/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratorios", "1"]
+            }
+          }
+        },
+        {
+          "name": "Listar activos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/laboratorios/activos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratorios", "activos"]
+            }
+          }
+        },
+        {
+          "name": "Listar eliminados (soft-delete)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/laboratorios/eliminados",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratorios", "eliminados"]
+            }
+          }
+        },
+        {
+          "name": "Crear laboratorio",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Laboratorio 1\",\n  \"ubicacion\": \"Bloque A, Piso 2\",\n  \"capacidad\": 30,\n  \"descripcion\": \"Laboratorio de computación general\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratorios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratorios"]
+            }
+          }
+        },
+        {
+          "name": "Editar laboratorio",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Laboratorio 1 Actualizado\",\n  \"ubicacion\": \"Bloque A, Piso 2\",\n  \"capacidad\": 35,\n  \"descripcion\": \"Descripción actualizada\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratorios/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratorios", "1"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar (soft-delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/laboratorios/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratorios", "1"]
+            }
+          }
+        },
+        {
+          "name": "Restaurar laboratorio",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/laboratorios/1/restore",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratorios", "1", "restore"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar permanente",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/laboratorios/1/permanent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratorios", "1", "permanent"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💻 Equipos",
+      "item": [
+        {
+          "name": "Listar todos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/equipos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "equipos"]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/equipos/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "equipos", "1"]
+            }
+          }
+        },
+        {
+          "name": "Listar activos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/equipos/activos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "equipos", "activos"]
+            }
+          }
+        },
+        {
+          "name": "Listar eliminados (soft-delete)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/equipos/eliminados",
+              "host": ["{{base_url}}"],
+              "path": ["api", "equipos", "eliminados"]
+            }
+          }
+        },
+        {
+          "name": "Equipos por laboratorio",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/equipos/laboratorio/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "equipos", "laboratorio", "1"]
+            }
+          }
+        },
+        {
+          "name": "Crear equipo",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"LAB1-PC01\",\n  \"tipo\": \"PC\",\n  \"marca\": \"Dell\",\n  \"modelo\": \"OptiPlex 3090\",\n  \"numeroSerie\": \"SN123456\",\n  \"estado\": \"OPERATIVO\",\n  \"laboratorioId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/equipos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "equipos"]
+            },
+            "description": "estados válidos: OPERATIVO, EN_MANTENIMIENTO, DAÑADO, FUERA_DE_SERVICIO"
+          }
+        },
+        {
+          "name": "Editar equipo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"LAB1-PC01\",\n  \"tipo\": \"PC\",\n  \"marca\": \"Dell\",\n  \"modelo\": \"OptiPlex 3090\",\n  \"numeroSerie\": \"SN123456\",\n  \"estado\": \"EN_MANTENIMIENTO\",\n  \"laboratorioId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/equipos/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "equipos", "1"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar (soft-delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/equipos/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "equipos", "1"]
+            }
+          }
+        },
+        {
+          "name": "Restaurar equipo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/equipos/1/restore",
+              "host": ["{{base_url}}"],
+              "path": ["api", "equipos", "1", "restore"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar permanente",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/equipos/1/permanent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "equipos", "1", "permanent"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Usuarios",
+      "item": [
+        {
+          "name": "Mi perfil (me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "me"]
+            }
+          }
+        },
+        {
+          "name": "Listar todos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios"]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "1"]
+            }
+          }
+        },
+        {
+          "name": "Listar activos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/activos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "activos"]
+            }
+          }
+        },
+        {
+          "name": "Listar eliminados (soft-delete)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/eliminados",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "eliminados"]
+            }
+          }
+        },
+        {
+          "name": "Crear usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"jperez\",\n  \"email\": \"jperez@universidad.edu\",\n  \"nombreCompleto\": \"Juan Pérez\",\n  \"keycloakId\": null,\n  \"roles\": \"ROLE_PROFESOR\",\n  \"carrera\": null,\n  \"facultad\": null,\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios"]
+            }
+          }
+        },
+        {
+          "name": "Editar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"jperez\",\n  \"email\": \"jperez@universidad.edu\",\n  \"nombreCompleto\": \"Juan Pérez García\",\n  \"roles\": \"ROLE_PROFESOR\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "1"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar (soft-delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "1"]
+            }
+          }
+        },
+        {
+          "name": "Restaurar usuario",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/1/restore",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "1", "restore"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar permanente",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/1/permanent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "1", "permanent"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚠️ Novedades",
+      "item": [
+        {
+          "name": "Listar todas",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/novedades",
+              "host": ["{{base_url}}"],
+              "path": ["api", "novedades"]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/novedades/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "novedades", "1"]
+            }
+          }
+        },
+        {
+          "name": "Mis novedades",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/novedades/mis-novedades",
+              "host": ["{{base_url}}"],
+              "path": ["api", "novedades", "mis-novedades"]
+            }
+          }
+        },
+        {
+          "name": "Filtrar por estado",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/novedades/estado/PENDIENTE",
+              "host": ["{{base_url}}"],
+              "path": ["api", "novedades", "estado", "PENDIENTE"]
+            },
+            "description": "Estados válidos: PENDIENTE, EN_PROCESO, SOLUCIONADA"
+          }
+        },
+        {
+          "name": "Reportar novedad",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"PC no enciende\",\n  \"descripcion\": \"La PC LAB1-PC03 no enciende al presionar el botón de encendido\",\n  \"tipo\": \"EQUIPO\",\n  \"prioridad\": \"ALTA\",\n  \"laboratorioId\": 1,\n  \"equipoId\": 3\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/novedades",
+              "host": ["{{base_url}}"],
+              "path": ["api", "novedades"]
+            },
+            "description": "tipo: EQUIPO o GENERAL | prioridad: BAJA, MEDIA, ALTA, CRITICA | equipoId: requerido si tipo=EQUIPO"
+          }
+        },
+        {
+          "name": "Reportar novedad GENERAL",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Proyector con imagen borrosa\",\n  \"descripcion\": \"El proyector del laboratorio presenta imagen borrosa, necesita mantenimiento\",\n  \"tipo\": \"GENERAL\",\n  \"prioridad\": \"MEDIA\",\n  \"laboratorioId\": 1,\n  \"equipoId\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/novedades",
+              "host": ["{{base_url}}"],
+              "path": ["api", "novedades"]
+            }
+          }
+        },
+        {
+          "name": "Cambiar estado (solo ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nuevoEstado\": \"SOLUCIONADA\",\n  \"observacionesResolucion\": \"Se reemplazó el cable de alimentación del equipo\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/novedades/1/estado",
+              "host": ["{{base_url}}"],
+              "path": ["api", "novedades", "1", "estado"]
+            },
+            "description": "Estados: PENDIENTE, EN_PROCESO, SOLUCIONADA"
+          }
+        },
+        {
+          "name": "Adjuntar imagen a novedad",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreArchivo\": \"evidencia.jpg\",\n  \"tipoMime\": \"image/jpeg\",\n  \"imagenBase64\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/novedades/1/imagenes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "novedades", "1", "imagenes"]
+            },
+            "description": "imagenBase64: imagen convertida a Base64. El ejemplo usa un pixel de 1x1 para prueba."
+          }
+        },
+        {
+          "name": "Ver imágenes de novedad",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/novedades/1/imagenes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "novedades", "1", "imagenes"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 Registros de Uso",
+      "item": [
+        {
+          "name": "Registrar entrada",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"laboratorioId\": 1,\n  \"proposito\": \"Clase de Programación\",\n  \"observaciones\": null,\n  \"esExamen\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/registros/entrada",
+              "host": ["{{base_url}}"],
+              "path": ["api", "registros", "entrada"]
+            }
+          }
+        },
+        {
+          "name": "Registrar entrada (con laboratorio secundario - examen)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"laboratorioId\": 1,\n  \"laboratorioSecundarioId\": 2,\n  \"proposito\": \"Examen Final\",\n  \"observaciones\": \"Examen de base de datos\",\n  \"esExamen\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/registros/entrada",
+              "host": ["{{base_url}}"],
+              "path": ["api", "registros", "entrada"]
+            }
+          }
+        },
+        {
+          "name": "Registrar salida",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"observaciones\": \"Sesión finalizada sin incidentes\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/registros/salida",
+              "host": ["{{base_url}}"],
+              "path": ["api", "registros", "salida"]
+            }
+          }
+        },
+        {
+          "name": "Mis registros",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/registros/mis-registros",
+              "host": ["{{base_url}}"],
+              "path": ["api", "registros", "mis-registros"]
+            }
+          }
+        },
+        {
+          "name": "Todos los registros (admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/registros/todos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "registros", "todos"]
+            }
+          }
+        },
+        {
+          "name": "Registros por usuario",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/registros/usuario/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "registros", "usuario", "1"]
+            }
+          }
+        },
+        {
+          "name": "Registros por laboratorio",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/registros/laboratorio/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "registros", "laboratorio", "1"]
+            }
+          }
+        },
+        {
+          "name": "Registros activos (usuarios dentro ahora)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/registros/activos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "registros", "activos"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔍 Auditoría",
+      "item": [
+        {
+          "name": "Cambios recientes",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/auditoria/recent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auditoria", "recent"]
+            }
+          }
+        },
+        {
+          "name": "Revisiones de entidad",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/audit/revisions/Laboratorio/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "audit", "revisions", "Laboratorio", "1"]
+            },
+            "description": "entityClass: Usuario, Equipo, Laboratorio, Novedad"
+          }
+        },
+        {
+          "name": "Revisión específica de entidad",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/audit/revisions/Laboratorio/1/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "audit", "revisions", "Laboratorio", "1", "1"]
+            },
+            "description": "Formato: /revisions/{entityClass}/{entityId}/{revisionNumber}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧪 Test / Roles",
+      "item": [
+        {
+          "name": "Endpoint público (sin token)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/public",
+              "host": ["{{base_url}}"],
+              "path": ["public"]
+            }
+          }
+        },
+        {
+          "name": "Solo ADMIN",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/admin",
+              "host": ["{{base_url}}"],
+              "path": ["admin"]
+            }
+          }
+        },
+        {
+          "name": "Solo PROFESOR",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/profesor",
+              "host": ["{{base_url}}"],
+              "path": ["profesor"]
+            }
+          }
+        },
+        {
+          "name": "Info usuario autenticado",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/me",
+              "host": ["{{base_url}}"],
+              "path": ["me"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

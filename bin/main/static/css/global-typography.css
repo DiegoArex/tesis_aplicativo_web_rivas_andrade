@@ -1,0 +1,100 @@
+/* ══ TIPOGRAFÍA GLOBAL — Sistema de Laboratorios FING ══ */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Open+Sans:wght@300;400;600&family=Roboto+Flex:opsz,wght@8..144,400;500;600;700&display=swap");
+
+:root {
+  --font-titles:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-subs: "Roboto Flex", sans-serif;
+  --font-text: "Open Sans", sans-serif;
+
+  /* Colores del Sistema de Diseño */
+  --text-primary: #051923;    /* Nearly Black para texto base */
+  --text-secondary: #003554;  /* Deep Blue para subtítulos */
+  --text-muted: #6c757d;
+  --text-light: #adb5bd;
+  --text-on-dark: #ffffff;
+  --text-on-accent: #ffffff;
+  --text-link: #0582ca;
+  --text-danger: #e26d5c;    /* Accent color for errors */
+  --text-success: #00a6fb;
+}
+
+body {
+  font-family: var(--font-text);
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Headings (Titles - Inter) */
+h1 {
+  font-family: var(--font-titles);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+h2 {
+  font-family: var(--font-titles);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Subheadings (Subs - Roboto Flex) */
+h3 {
+  font-family: var(--font-subs);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+h4 {
+  font-family: var(--font-subs);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+h5 {
+  font-family: var(--font-subs);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+h6 {
+  font-family: var(--font-subs);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Navbar */
+.navbar-brand {
+  font-family: var(--font-titles);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.nav-link {
+  font-family: var(--font-subs);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Table headers & Badges (Roboto Flex) */
+.table thead th,
+.badge,
+.section-title {
+  font-family: var(--font-subs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Forms & Buttons (Open Sans for readability) */
+.form-label,
+.btn {
+  font-family: var(--font-text);
+  font-weight: 600;
+}
+.form-control,
+.form-select {
+  font-family: var(--font-text);
+}
