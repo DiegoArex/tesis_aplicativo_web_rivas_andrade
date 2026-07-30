@@ -10,22 +10,22 @@ public class PermissionConstants {
     // ===== EXPRESIONES DE AUTORIZACIÓN =====
     
     // Solo Administrador
-    public static final String ADMIN_ONLY = "hasRole('ROLE_ADMIN')";
+    public static final String ADMIN_ONLY = "hasRole('ADMIN')";
 
     // Solo autenticados
     public static final String AUTHENTICATED = "isAuthenticated()";
 
     // Docentes (Profesor, Director, Admin)
-    public static final String DOCENTES = "hasAnyRole('ROLE_PROFESOR', 'ROLE_FACULTAD_DIRECTOR_CARRERA', 'ROLE_ADMIN')";
+    public static final String DOCENTES = "hasAnyRole('PROFESOR', 'FACULTAD_DIRECTOR_CARRERA', 'ADMIN')";
 
     // Directores (Director, Admin)
-    public static final String DIRECTORES = "hasAnyRole('ROLE_FACULTAD_DIRECTOR_CARRERA', 'ROLE_ADMIN')";
+    public static final String DIRECTORES = "hasAnyRole('FACULTAD_DIRECTOR_CARRERA', 'ADMIN')";
 
     // Técnico, Docentes y Admin
-    public static final String TECNICO_Y_DOCENTES = "hasAnyRole('ROLE_USUARIO', 'ROLE_PROFESOR', 'ROLE_FACULTAD_DIRECTOR_CARRERA', 'ROLE_ADMIN')";
+    public static final String TECNICO_Y_DOCENTES = "hasAnyRole('USUARIO', 'PROFESOR', 'FACULTAD_DIRECTOR_CARRERA', 'ADMIN')";
 
     // Usuarios Registrados (Técnico, Docentes y Admin)
-    public static final String USUARIOS_REGISTRADOS = "hasAnyRole('ROLE_USUARIO', 'ROLE_PROFESOR', 'ROLE_FACULTAD_DIRECTOR_CARRERA', 'ROLE_ADMIN')";
+    public static final String USUARIOS_REGISTRADOS = "hasAnyRole('USUARIO', 'PROFESOR', 'FACULTAD_DIRECTOR_CARRERA', 'ADMIN')";
 
     // ===== REFERENCIAS POR ENDPOINT =====
 
@@ -44,8 +44,8 @@ public class PermissionConstants {
 
     // Novedades
     public static final String NOVEDAD_CREATE = USUARIOS_REGISTRADOS;
-    public static final String NOVEDAD_CHANGE_STATUS = "hasAnyRole('ROLE_USUARIO', 'ROLE_ADMIN')";  // Solo USUARIO y ADMIN
-    public static final String NOVEDAD_UPLOAD_IMAGES = "hasAnyRole('ROLE_USUARIO', 'ROLE_ADMIN')";  // Solo USUARIO y ADMIN para subir fotos
+    public static final String NOVEDAD_CHANGE_STATUS = "hasAnyRole('USUARIO', 'ADMIN')";  // Solo USUARIO y ADMIN
+    public static final String NOVEDAD_UPLOAD_IMAGES = USUARIOS_REGISTRADOS;  // Usuarios registrados pueden adjuntar fotos
     public static final String NOVEDAD_READ = AUTHENTICATED;
 
     // Usuarios

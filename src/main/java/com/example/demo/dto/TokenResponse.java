@@ -22,4 +22,7 @@ public class TokenResponse {
 
   @JsonProperty("expires_in")
     private long expires_in;
+
+  @JsonProperty("refresh_expires_in")
+    private long refresh_expires_in;
 }

@@ -7,12 +7,18 @@ import com.example.demo.service.NovedadService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 //Controlador REST para gestión de Novedades
@@ -98,6 +104,34 @@ public class NovedadController {
             @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody ImagenNovedadRequestDTO requestDTO) {
         String username = jwt.getClaim("preferred_username");
+        ImagenNovedadResponseDTO imagen = novedadService.adjuntarImagen(id, username, requestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(imagen);
+    }
+
+    @PostMapping(value = "/{id}/imagenes", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize(PermissionConstants.NOVEDAD_UPLOAD_IMAGES)
+    public ResponseEntity<ImagenNovedadResponseDTO> adjuntarImagenMultipart(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Jwt jwt,
+            MultipartHttpServletRequest request) {
+        String username = jwt.getClaim("preferred_username");
+        MultipartFile archivo = request.getFileMap().values().stream()
+                .filter(file -> file != null && !file.isEmpty())
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Debe enviar un archivo de imagen en multipart/form-data"));
+
+        ImagenNovedadRequestDTO requestDTO = new ImagenNovedadRequestDTO();
+        requestDTO.setNombreArchivo(archivo.getOriginalFilename());
+        requestDTO.setTipoMime(archivo.getContentType());
+
+        try {
+            requestDTO.setImagenBase64(Base64.getEncoder().encodeToString(archivo.getBytes()));
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "No se pudo leer la imagen enviada", e);
+        }
+
         ImagenNovedadResponseDTO imagen = novedadService.adjuntarImagen(id, username, requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(imagen);
     }

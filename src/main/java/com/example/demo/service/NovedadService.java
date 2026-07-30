@@ -120,7 +120,7 @@ public class NovedadService {
         imagen.setTipoMime(tipoMime.toLowerCase());
         imagen.setImagenBase64(base64);
 
-        return convertirAImagenResponseDTO(imagenNovedadRepository.save(imagen));
+        return convertirAImagenResponseDTO(imagenNovedadRepository.save(imagen), false);
     }
 
     @Transactional(readOnly = true)
@@ -158,7 +158,7 @@ public class NovedadService {
     @Transactional(readOnly = true)
     public List<ImagenNovedadResponseDTO> obtenerImagenes(Long novedadId) {
         return imagenNovedadRepository.findByNovedadId(novedadId).stream()
-                .map(this::convertirAImagenResponseDTO)
+                .map(imagen -> convertirAImagenResponseDTO(imagen, true))
                 .collect(Collectors.toList());
     }
 
@@ -212,13 +212,13 @@ public class NovedadService {
         return dto;
     }
 
-    private ImagenNovedadResponseDTO convertirAImagenResponseDTO(ImagenNovedad imagen) {
+    private ImagenNovedadResponseDTO convertirAImagenResponseDTO(ImagenNovedad imagen, boolean incluirBase64) {
         ImagenNovedadResponseDTO dto = new ImagenNovedadResponseDTO();
         dto.setId(imagen.getId());
         dto.setNovedadId(imagen.getNovedad().getId());
         dto.setNombreArchivo(imagen.getNombreArchivo());
         dto.setTipoMime(imagen.getTipoMime());
-        dto.setImagenBase64(imagen.getImagenBase64());
+        dto.setImagenBase64(incluirBase64 ? imagen.getImagenBase64() : null);
         dto.setCreatedAt(imagen.getCreatedAt());
         return dto;
     }

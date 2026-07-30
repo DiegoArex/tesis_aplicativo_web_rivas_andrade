@@ -72,6 +72,7 @@ public class AuthService {
             logger.info("✅ LOGIN EXITOSO para usuario: {}", username);
             logger.info("Token Type: {} | Expires In: {} segundos",
                     tokenResponse.getToken_type(), tokenResponse.getExpires_in());
+                logger.info("Refresh Token Expires In: {} segundos", tokenResponse.getRefresh_expires_in());
             // El contenido del token no se registra en logs por seguridad
             logger.info("=".repeat(80));
 
