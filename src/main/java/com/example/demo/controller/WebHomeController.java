@@ -2,6 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.auth.AuthService;
 import com.example.demo.dto.TokenResponse;
+import com.example.demo.security.PermissionConstants;
+import com.example.demo.service.EquipoService;
+import com.example.demo.service.LaboratorioService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,11 +25,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,6 +39,8 @@ public class WebHomeController {
 
     private final AuthService authService;
     private final JwtDecoder jwtDecoder;
+    private final LaboratorioService laboratorioService;
+    private final EquipoService equipoService;
 
     @GetMapping("/")
     public String home() {
@@ -95,6 +98,15 @@ public class WebHomeController {
     public String dashboard(Model model) {
         model.addAttribute("titulo", "Dashboard");
         return "dashboard";
+    }
+
+    @GetMapping("/web/papelera")
+    @PreAuthorize(PermissionConstants.ADMIN_ONLY)
+    public String papelera(Model model) {
+        model.addAttribute("titulo", "Papelera");
+        model.addAttribute("laboratoriosEliminados", laboratorioService.listarEliminados());
+        model.addAttribute("equiposEliminados", equipoService.listarEliminados());
+        return "papelera";
     }
 
     private Collection<? extends GrantedAuthority> mapKeycloakAuthorities(Map<String, Object> claims) {

@@ -186,6 +186,14 @@
         }
         .card-auditoria .card-footer-strip { background: #030d14; }
 
+        /* Papelera — rojo oscuro */
+        .card-papelera {
+            background: linear-gradient(135deg, #7a1f1f 0%, #4b0f0f 100%);
+            color: #fff;
+            border-bottom: 4px solid #7a1f1f;
+        }
+        .card-papelera .card-footer-strip { background: #3b0b0b; }
+
         /* ── Separador de módulos ── */
         .modules-divider {
             display: flex;
@@ -418,6 +426,27 @@
                     </div>
                     <div class="card-footer-strip">
                         <i class="fas fa-user-tie"></i> Directores y Admin
+                    </div>
+                </div>
+            </div>
+
+            <!-- Papelera — ADMIN -->
+            <div class="col-xl-4 col-md-6" sec:authorize="hasRole('ROLE_ADMIN')">
+                <div class="access-card card-papelera" onclick="window.location='/web/papelera'">
+                    <div class="card-inner">
+                        <div class="card-top">
+                            <div>
+                                <div class="card-module">Papelera</div>
+                                <div class="card-title">Restaurar</div>
+                                <div class="card-sub">Laboratorios y equipos eliminados</div>
+                            </div>
+                            <div class="card-icon-wrap">
+                                <i class="fas fa-trash-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer-strip">
+                        <i class="fas fa-shield-alt"></i> Solo administradores
                     </div>
                 </div>
             </div>
