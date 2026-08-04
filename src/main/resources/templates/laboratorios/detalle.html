@@ -46,6 +46,9 @@
                     <li class="nav-item" sec:authorize="hasAnyRole('ROLE_FACULTAD_DIRECTOR_CARRERA', 'ROLE_ADMIN')">
                         <a class="nav-link" href="/web/auditoria"><i class="fas fa-history"></i> Auditoría</a>
                     </li>
+<li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN')">
+    <a class="nav-link" href="/web/papelera"><i class="fas fa-trash-alt"></i> Papelera</a>
+</li>
                 </ul>
             </div>
         </div>
