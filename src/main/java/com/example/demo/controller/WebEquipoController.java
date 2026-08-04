@@ -206,7 +206,7 @@ public class WebEquipoController {
             redirectAttributes.addFlashAttribute("mensaje", "Error al eliminar equipo: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipo", "danger");
         }
-        return "redirect:/web/equipos";
+        return "redirect:/web/equipos/eliminados";
     }
 
     @PostMapping("/{id}/restore")

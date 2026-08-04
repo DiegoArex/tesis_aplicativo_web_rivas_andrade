@@ -84,19 +84,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="eq : ${equipos}">
-                                <td th:text="${eq.id}"></td>
-                                <td class="fw-bold" th:text="${eq.codigo}"></td>
-                                <td th:text="${eq.tipo}"></td>
-                                <td th:text="${eq.laboratorioNombre}"></td>
+                            <tr th:each="equipo : ${equipos}">
+                                <td th:text="${equipo.id}"></td>
+                                <td class="fw-bold" th:text="${equipo.codigo}"></td>
+                                <td th:text="${equipo.tipo}"></td>
+                                <td th:text="${equipo.laboratorioNombre}"></td>
                                 <td class="text-center">
                                     <div class="btn-group">
-                                        <form th:action="@{/web/equipos/{id}/restore(id=${eq.id})}" method="post" class="d-inline">
+                                        <form th:action="@{/web/equipos/{id}/restore(id=${equipo.id})}" method="post" class="d-inline">
                                             <button type="submit" class="btn btn-sm btn-outline-success" title="Restaurar">
                                                 <i class="fas fa-undo"></i> Restaurar
                                             </button>
                                         </form>
-                                        <form th:action="@{/web/equipos/{id}/hard-delete(id=${eq.id})}" method="post" class="d-inline ms-1" onsubmit="return confirm('¿Eliminar permanentemente?')">
+                                        <form th:action="@{/web/equipos/{id}/hard-delete(id=${equipo.id})}" method="post" class="d-inline ms-1" onsubmit="return confirm('¿Eliminar permanentemente?')">
                                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar Definitivamente">
                                                 <i class="fas fa-times"></i> Borrar
                                             </button>
@@ -104,7 +104,7 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr th:if="${equipos.empty}">
+                            <tr th:if="${equipos == null or #lists.isEmpty(equipos)}">
                                 <td colspan="5" class="text-center py-4 text-muted">
                                     <i class="fas fa-box-open fa-2x mb-2 d-block opacity-25"></i>
                                     No hay equipos en la papelera.
